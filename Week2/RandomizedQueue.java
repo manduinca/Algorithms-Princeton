@@ -1,93 +1,121 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import edu.princeton.cs.algs4.StdRandom;
 
-public class RandomizedQueue <Item> implements Iterable <Item>{
-    private Node first, last;
-    private int n = 0;
-    private class Node{
-        Item item;
-        Node next;
+public class RandomizedQueue<Item> implements Iterable<Item> {
+    private Item[] q;            // queue elements
+    private int N = 0;           // number of elements on queue
+    private int first = 0;       // index of first element of queue
+    private int last  = 0;       // index of next available slot
+
+    public RandomizedQueue() {
+        q = (Item[]) new Object[2];
     }
-    public RandomizedQueue(){
-        first = null;
-        last = null;
+
+    public boolean isEmpty() {
+        return N == 0;
     }
-    public boolean isEmpty(){
-        return first == null;
+
+    public int size() {
+        return N;
     }
-    public int size(){
-        return n;
-    }
-    public void enqueue(Item item){
-        if(item == null) throw new java.lang.NullPointerException();
-        Node oldlast = last;
-        last = new Node();
-        last.item = item;
-        last.next = null;
-        if(isEmpty()) first = last;
-        else oldlast.next = last;
-        n++;
-    }
-    public Item dequeue(){
-        if(n == 0) throw new java.util.NoSuchElementException();
-        Item item;
-        int m = StdRandom.uniform(n);
-        System.out.println(m);
-        if(m == 0){
-            item = first.item;
-            first = first.next;
+
+    private void resize(int max) {
+        assert max >= N;
+        Item[] temp = (Item[]) new Object[max];
+        for (int i = 0; i < N; i++) {
+            temp[i] = q[(first + i) % q.length];
         }
-        else{
-            Node it = first;
-            for(int i = 0; i < m - 1; i++)
-                it = it.next;
-            item = it.next.item;
-            it.next = it.next.next;
-        }
-        if(isEmpty()) last = null;
-        n--;
+        q = temp;
+        first = 0;
+        last  = N;
+    }
+ 
+    public void enqueue(Item item) {
+        if (item == null) throw new java.lang.NullPointerException();
+        if (N == q.length) resize(2*q.length);   // double size of array if necessary
+        q[last++] = item;                        // add item
+        if (last == q.length) last = 0;          // wrap-around
+        N++;
+    }
+
+    public Item dequeue() {
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        int m = StdRandom.uniform(N);
+        Item temp = q[first];
+        q[first] = q[(first + m) % q.length];
+        q[(first + m) % q.length] = temp;
+        Item item = q[first];
+        q[first] = null;                            // to avoid loitering
+        N--;
+        first++;
+        if (first == q.length) first = 0;           // wrap-around
+        if (N > 0 && N == q.length/4) resize(q.length/2); 
         return item;
     }
-    public Item sample(){
-        if(n == 0) throw new java.util.NoSuchElementException();
-        int m = StdRandom.uniform(n);
-        System.out.println(m);
-        Iterator <Item> it = iterator();
-        Item item = first.item;
-        for(int i = 0; i <= m; i++)
-            item = it.next();
-        return item;
+
+    public Item sample() {
+        if (isEmpty()) throw new NoSuchElementException("Queue underflow");
+        int m = StdRandom.uniform(N);
+        return q[(first + m) % q.length];
     }
-    public Iterator <Item> iterator(){ return new ListIterator();}
-    private class ListIterator implements Iterator<Item>{
-        private Node current = first;
-        public boolean hasNext(){ return current != null;}
-        public void remove(){ throw new java.lang.UnsupportedOperationException();}      
-        public Item next(){
-            if(!hasNext()) throw new java.util.NoSuchElementException();
-            Item item = current.item;
-            current = current.next;
+
+    public Iterator<Item> iterator() {
+        return new ArrayIterator();
+    }
+
+    private class ArrayIterator implements Iterator<Item> {
+        private int i = 0;
+        private Item[] a = (Item[]) new Object[N];
+        public ArrayIterator() {
+            int k = 0;
+            for(int j = 0; j < q.length; j++)
+                if(q[j] != null) a[k++] = q[j];
+            StdRandom.shuffle(a);
+        }
+        public boolean hasNext() { return i < N; }
+        public void remove() { throw new UnsupportedOperationException(); }
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            Item item = a[i];
+            i++;
             return item;
         }
     }
-    public static void main(String[] args){
-        RandomizedQueue <String> rq = new RandomizedQueue <String>();
-        rq.enqueue("20");
-        rq.enqueue("10");
-        rq.enqueue("30");
-        rq.enqueue("5");
-        rq.enqueue("6");
-        rq.enqueue("7");
-        Iterator <String> it = rq.iterator();
-        while(it.hasNext()){
-            System.out.println(it.next());
-        }
-        rq.dequeue();
-        rq.dequeue();
-        System.out.println(rq.sample());
-        System.out.println();
-        it = rq.iterator();
-        while(it.hasNext()){
-            System.out.println(it.next());
-        }
+
+    public static void main(String[] args) {
+        RandomizedQueue <String> q = new RandomizedQueue <String> ();
+        /*for(int i = 0; i < 100; i++)
+            q.enqueue(i);
+        Iterator <Integer> it = q.iterator();
+        Iterator <Integer> it2 = q.iterator();
+        while(it.hasNext()) {
+            while(it2.hasNext()) {
+                System.out.println(it.next() + " " + it2.next());
+            }
+        }*/
+         //System.out.println(q.size());        
+         q.enqueue("451");
+         //System.out.println(q.dequeue());        
+        // System.out.println(q.isEmpty());        
+         //System.out.println(q.isEmpty());        
+         //System.out.println(q.isEmpty());        
+         //System.out.println(q.size());        
+         q.enqueue("423");
+        // q.enqueue("466");
+         System.out.println(q.dequeue());        
+         System.out.println(q.sample());        
+        /*
+        q.enqueue(0);
+        System.out.println(q.sample());
+        System.out.println(q.sample());
+        System.out.println(q.sample());
+        q.enqueue(2);
+        System.out.println(q.sample());
+        System.out.println(q.sample());
+        q.enqueue(1);
+        System.out.println(q.sample());
+        System.out.println(q.sample());
+        System.out.println(q.sample());*/
     }
 }

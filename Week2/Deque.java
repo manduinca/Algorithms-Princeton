@@ -62,14 +62,14 @@ public class Deque <Item> implements Iterable <Item>{
         Item item = last.item;
         last = last.previous;
         if(isEmpty()) first = null;
-	else last.next = null;
+	    else last.next = null;
         n--;
         return item; 
     }
-    public Iterator <Item> iterator(){ return new ListIterator();}
+    public Iterator <Item> iterator(){return new ListIterator();}
     private class ListIterator implements Iterator<Item>{
         private Node current = first;
-        public boolean hasNext(){ return current != null;}
+        public boolean hasNext(){return current != null;}
         public void remove(){throw new java.lang.UnsupportedOperationException();}      
         public Item next(){
             if(!hasNext()) throw new java.util.NoSuchElementException();
@@ -95,8 +95,8 @@ public class Deque <Item> implements Iterable <Item>{
         d.removeFirst();
         d.removeFirst();
         d.removeLast();
-	d.removeFirst();
-	d.addFirst("1");
+	    d.removeFirst();
+	    d.addFirst("1");
         it = d.iterator();
         while(it.hasNext()){
             System.out.println(it.next());
