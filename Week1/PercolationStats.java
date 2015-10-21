@@ -3,7 +3,7 @@ import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats{
     private int N, T;
-    private double[] X;
+    private double X[];
     private Percolation P;
     private int random(){
         int n = 1 + StdRandom.uniform(N * N);

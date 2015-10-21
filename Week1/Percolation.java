@@ -1,7 +1,7 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation{
-    private boolean[][] M;
+    private boolean M[][];
     private int N;
     private WeightedQuickUnionUF UF, UF2;
     public Percolation(int T){
