@@ -2,22 +2,22 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.Queue;
 
 public class Board {
-    private int[][] board;
-    private int[][] goal;
+    private int[] board;
     private int[][] tempboard;
     private int N;
 
     public Board(int[][] blocks) {
         N = blocks[0].length;
-        goal = new int[N][N];
-        board = new int[N][N];
+        board = new int[N * N];
         tempboard = new int[N][N];
         for(int i = 0; i < N; i++)
-            for(int j = 0; j < N; j++) {
-                board[i][j] = blocks[i][j];
-                goal[i][j] = i * N + j + 1;
-            }
-        goal[N - 1][N - 1] = 0;
+            for(int j = 0; j < N; j++)
+                board[i * N + j] = blocks[i][j];
+    }
+    private int goal(int i, int j) {
+        if(i * N + j < N * N -1)
+            return i * N + j + 1;
+        return 0;
     }
     public int dimension() {
         return N;
@@ -26,8 +26,8 @@ public class Board {
         int out = 0;
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                if(goal[i][j] != 0)
-                    if(goal[i][j] != board[i][j])
+                if(goal(i, j) != 0)
+                    if(goal(i, j) != board[i * N + j])
                         out++;
         return out;
     }
@@ -39,22 +39,22 @@ public class Board {
         int sum = 0;
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                if(board[i][j] != 0)
-                    sum += abs(i, (board[i][j] - 1) / N) +
-                           abs(j, board[i][j] - (board[i][j] - 1) / N * N - 1);
+                if(board[i * N + j] != 0)
+                    sum += abs(i, (board[i * N + j] - 1) / N) +
+                           abs(j, board[i * N + j] - (board[i * N + j] - 1) / N * N - 1);
         return sum;
     }
     public boolean isGoal() {
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                if(goal[i][j] != board[i][j]) return false;
+                if(goal(i, j) != board[i * N + j]) return false;
         return true;
     }
     public Board twin() {
         int[][] boardtwin = new int[N][N];
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                boardtwin[i][j] = board[i][j];
+                boardtwin[i][j] = board[i * N + j];
         int ri = StdRandom.uniform(N), rj = StdRandom.uniform(N);
         while(boardtwin[ri][rj] == 0) {
             ri = StdRandom.uniform(N);
@@ -79,13 +79,13 @@ public class Board {
         if(N != y.N) return false;
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                if(board[i][j] != y.board[i][j]) return false;
+                if(board[i * N + j] != y.board[i * N + j]) return false;
         return true;
     }
     private void copyBoard() {
         for(int i = 0; i < N; i++)
             for(int j = 0; j < N; j++)
-                tempboard[i][j] = board[i][j];
+                tempboard[i][j] = board[i * N + j];
     }
     public Iterable <Board> neighbors() {
         int ii = 0, jj = 0;
@@ -93,7 +93,7 @@ public class Board {
         Queue <Board> pila = new Queue();
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++)
-                if(board[i][j] == 0) {ii = i; jj = j; band = true; break;}
+                if(board[i * N + j] == 0) {ii = i; jj = j; band = true; break;}
             if(band) break;
         }
         if(ii - 1 >= 0) {
@@ -127,8 +127,8 @@ public class Board {
         s.append(N + "\n");
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N - 1; j++)
-                s.append(board[i][j] + " ");
-            s.append(board[i][N - 1] + "\n");
+                s.append(board[i * N + j] + " ");
+            s.append(board[i * N + N - 1] + "\n");
         }
         return s.toString(); 
     }
